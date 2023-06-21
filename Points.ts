@@ -5,6 +5,7 @@ export interface Point {
     position: THREE.Vector3;
     value: number;
     id: number;
+    pattern: number;
 }
 
 export interface Face {
@@ -24,6 +25,7 @@ export let getTestPoints = (size: number, radius: number): Point[] => {
                     position: new THREE.Vector3(i, j, k),
                     value: 0,
                     id: 0,
+                    pattern: 0,
                 };
                 pointTemp.id = id;
                 pointTemp.position = new THREE.Vector3(i, j, k);
