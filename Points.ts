@@ -57,17 +57,6 @@ export let marchingCubeAlgorithum = (
                 for (let count = 9; count < 12; count++) {
                     vertlist.push(new THREE.Vector3());
                 }
-                // cube index maybe wrong.
-                /* let cubeIndex: number[] = [
-                    i * size * size + j * size + k,
-                    (i + 1) * size * size + j * size + k,
-                    i * size * size + (j + 1) * size + k,
-                    (i + 1) * size * size + (j + 1) * size + k,
-                    i * size * size + j * size + k + 1,
-                    (i + 1) * size * size + j * size + k + 1,
-                    i * size * size + (j + 1) * size + k + 1,
-                    (i + 1) * size * size + (j + 1) * size + k + 1,
-                ]; */
                 let cubeIndex: number[] = [
                     i * size * size + j * size + k,
                     i * size * size + j * size + k + 1,
