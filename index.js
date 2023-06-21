@@ -9,7 +9,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 const geometry = new THREE.BufferGeometry();
 let points = POINT.getTestPoints(100, 60);
-let faces = POINT.marchingCubeAlgorithum(points, 100, 60);
+let faces = POINT.marchingCubeAlgorithum(points, 100, 50);
 const vertices_temp = [];
 for (var i = 0; i < faces.length; i++) {
     vertices_temp.push(faces[i].first.x - 50);
@@ -28,11 +28,9 @@ const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 material.wireframe = true;
 const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
-camera.position.z = 60;
-
+camera.position.z = 70;
 function animate() {
     requestAnimationFrame(animate);
-    cube.rotation.x += 0.01;
     renderer.render(scene, camera);
 }
 animate();

@@ -81,29 +81,29 @@ export let marchingCubeAlgorithum = (points, size, isoLevel) => {
                 if (bits === 0)
                     continue;
                 if (bits & 1)
-                    vertlist[0] = VertexInterp(isoLevel, points[cubeIndex[0]].position, points[cubeIndex[1]].position, points[cubeIndex[0]].id, points[cubeIndex[1]].id);
+                    vertlist[0] = VertexInterp(isoLevel, points[cubeIndex[0]].position, points[cubeIndex[1]].position, points[cubeIndex[0]].value, points[cubeIndex[1]].value);
                 if (bits & 2)
-                    vertlist[1] = VertexInterp(isoLevel, points[cubeIndex[1]].position, points[cubeIndex[3]].position, points[cubeIndex[1]].id, points[cubeIndex[3]].id);
+                    vertlist[1] = VertexInterp(isoLevel, points[cubeIndex[1]].position, points[cubeIndex[3]].position, points[cubeIndex[1]].value, points[cubeIndex[3]].value);
                 if (bits & 4)
-                    vertlist[2] = VertexInterp(isoLevel, points[cubeIndex[2]].position, points[cubeIndex[3]].position, points[cubeIndex[2]].id, points[cubeIndex[3]].id);
+                    vertlist[2] = VertexInterp(isoLevel, points[cubeIndex[2]].position, points[cubeIndex[3]].position, points[cubeIndex[2]].value, points[cubeIndex[3]].value);
                 if (bits & 8)
-                    vertlist[3] = VertexInterp(isoLevel, points[cubeIndex[0]].position, points[cubeIndex[2]].position, points[cubeIndex[0]].id, points[cubeIndex[2]].id);
+                    vertlist[3] = VertexInterp(isoLevel, points[cubeIndex[0]].position, points[cubeIndex[2]].position, points[cubeIndex[0]].value, points[cubeIndex[2]].value);
                 if (bits & 16)
-                    vertlist[4] = VertexInterp(isoLevel, points[cubeIndex[4]].position, points[cubeIndex[5]].position, points[cubeIndex[4]].id, points[cubeIndex[5]].id);
+                    vertlist[4] = VertexInterp(isoLevel, points[cubeIndex[4]].position, points[cubeIndex[5]].position, points[cubeIndex[4]].value, points[cubeIndex[5]].value);
                 if (bits & 32)
-                    vertlist[5] = VertexInterp(isoLevel, points[cubeIndex[5]].position, points[cubeIndex[7]].position, points[cubeIndex[5]].id, points[cubeIndex[7]].id);
+                    vertlist[5] = VertexInterp(isoLevel, points[cubeIndex[5]].position, points[cubeIndex[7]].position, points[cubeIndex[5]].value, points[cubeIndex[7]].value);
                 if (bits & 64)
-                    vertlist[6] = VertexInterp(isoLevel, points[cubeIndex[6]].position, points[cubeIndex[7]].position, points[cubeIndex[6]].id, points[cubeIndex[7]].id);
+                    vertlist[6] = VertexInterp(isoLevel, points[cubeIndex[6]].position, points[cubeIndex[7]].position, points[cubeIndex[6]].value, points[cubeIndex[7]].value);
                 if (bits & 128)
-                    vertlist[7] = VertexInterp(isoLevel, points[cubeIndex[4]].position, points[cubeIndex[6]].position, points[cubeIndex[4]].id, points[cubeIndex[6]].id);
+                    vertlist[7] = VertexInterp(isoLevel, points[cubeIndex[4]].position, points[cubeIndex[6]].position, points[cubeIndex[4]].value, points[cubeIndex[6]].value);
                 if (bits & 256)
-                    vertlist[8] = VertexInterp(isoLevel, points[cubeIndex[0]].position, points[cubeIndex[4]].position, points[cubeIndex[0]].id, points[cubeIndex[4]].id);
+                    vertlist[8] = VertexInterp(isoLevel, points[cubeIndex[0]].position, points[cubeIndex[4]].position, points[cubeIndex[0]].value, points[cubeIndex[4]].value);
                 if (bits & 512)
-                    vertlist[9] = VertexInterp(isoLevel, points[cubeIndex[1]].position, points[cubeIndex[5]].position, points[cubeIndex[1]].id, points[cubeIndex[5]].id);
+                    vertlist[9] = VertexInterp(isoLevel, points[cubeIndex[1]].position, points[cubeIndex[5]].position, points[cubeIndex[1]].value, points[cubeIndex[5]].value);
                 if (bits & 1024)
-                    vertlist[10] = VertexInterp(isoLevel, points[cubeIndex[3]].position, points[cubeIndex[7]].position, points[cubeIndex[3]].id, points[cubeIndex[7]].id);
+                    vertlist[10] = VertexInterp(isoLevel, points[cubeIndex[3]].position, points[cubeIndex[7]].position, points[cubeIndex[3]].value, points[cubeIndex[7]].value);
                 if (bits & 2048)
-                    vertlist[11] = VertexInterp(isoLevel, points[cubeIndex[2]].position, points[cubeIndex[6]].position, points[cubeIndex[2]].id, points[cubeIndex[6]].id);
+                    vertlist[11] = VertexInterp(isoLevel, points[cubeIndex[2]].position, points[cubeIndex[6]].position, points[cubeIndex[2]].value, points[cubeIndex[6]].value);
                 let triTableTarget = triTable[targetIndex];
                 let triangles = [];
                 for (let count = 0; count < 4; ++count) {
@@ -131,15 +131,15 @@ export let marchingCubeAlgorithum = (points, size, isoLevel) => {
     return result;
 };
 let VertexInterp = (isolevel, p1, p2, valp1, valp2) => {
-    let mu;
-    let p;
+    let mu = 0;
+    let p = { x: 0, y: 0, z: 0 };
     if (Math.abs(isolevel - valp1) < 0.0001) {
         return p1;
     }
     if (Math.abs(isolevel - valp2) < 0.0001) {
         return p2;
     }
-    if (Math.abs(valp1 - valp1) < 0.0001) {
+    if (Math.abs(valp1 - valp2) < 0.0001) {
         return p1;
     }
     mu = (isolevel - valp1) / (valp2 - valp1);
