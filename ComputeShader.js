@@ -26,18 +26,18 @@ struct ResultCell {
 
 @group(0) @binding(6) var <storage,read_write> testTriangleIndex:array<f32>;
 
-fn VertexInterp(isoLevel: f32, p1: vec3<f32>, p2: vec3<f32>, valp1: f32, valp2: f32) -> vec3<f32> {
+fn VertexInterp(isolevel: f32, p1: vec3<f32>, p2: vec3<f32>, valp1: f32, valp2: f32) -> vec3<f32> {
     var p: vec3<f32>;
-    if abs(isoLevel - valp1) < 0.0001 {
+    if abs(isolevel - valp1) < 0.00001 {
         return p1;
     }
-    if abs(isoLevel - valp2) < 0.0001 {
+    if abs(isolevel - valp2) < 0.00001 {
         return p2;
     }
-    if abs(valp1 - valp2) < 0.0001 {
+    if abs(valp1 - valp2) < 0.00001 {
         return p1;
     }
-    let mu = (isoLevel - valp1) / (valp2 - valp1);
+    let mu = (isolevel - valp1) / (valp2 - valp1);
     p.x = p1.x + mu * (p2.x - p1.x);
     p.y = p1.y + mu * (p2.y - p1.y);
     p.z = p1.z + mu * (p2.z - p1.z);
@@ -48,7 +48,7 @@ fn VertexInterp(isoLevel: f32, p1: vec3<f32>, p2: vec3<f32>, valp1: f32, valp2: 
 fn main(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(local_invocation_id) local_invocation_id: vec3<u32>, @builtin(global_invocation_id) global_invocation_id: vec3<u32>, @builtin(local_invocation_index) local_invocation_index: u32, @builtin(num_workgroups) num_workgroups: vec3<u32>) {
     let workgroup_index = workgroup_id.x + workgroup_id.y * num_workgroups.x + workgroup_id.z * num_workgroups.x * num_workgroups.y;
     // id is right.
-    let id: u32 = workgroup_index + local_invocation_index;
+    var id: u32 = workgroup_index + local_invocation_index;
     let cubeIndex = array<u32,8>(
         id,
         id + 1,
@@ -59,6 +59,14 @@ fn main(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(local_invocatio
         id + size * size + size,
         id + size * size + size + u32(1),
     );
+
+    let x = id/(size*size);
+    let y = id%(size*size)/size;
+    let z = id%(size);
+
+    if(x>=size-1 || y>=size-1 || z>=size-1) {
+        return;
+    }
 
     var targetIndex: i32 = 0;
     if points[u32(cubeIndex[0])].value < isoLevel {
@@ -135,41 +143,41 @@ fn main(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(local_invocatio
         triangles[start / 3].second = vertlist[(triTable[tempIndex + 1])];
         triangles[start / 3].third = vertlist[(triTable[tempIndex + 2])];
     }
-
-    results[id * 36] = triangles[0].first.x;
+    id = (size-1)*(size-1)*x+(size-1)*y+z;
+    results[id * 36]  = triangles[0].first.x;
     results[id * 36 + 1] = triangles[0].first.y;
     results[id * 36 + 2] = triangles[0].first.z;
     results[id * 36 + 3] = triangles[0].second.x;
     results[id * 36 + 4] = triangles[0].second.y;
-    results[id * 36 + 5] = triangles[0].second.z;
-    results[id * 36 + 6] = triangles[0].third.x;
-    results[id * 36 + 7] = triangles[0].third.y;
-    results[id * 36 + 8] = triangles[0].third.z;
-    results[id * 36 + 9] = triangles[1].first.x;
-    results[id * 36 + 10] = triangles[1].first.y;
-    results[id * 36 + 11] = triangles[1].first.z;
-    results[id * 36 + 12] = triangles[1].second.x;
-    results[id * 36 + 13] = triangles[1].second.y;
-    results[id * 36 + 14] = triangles[1].second.z;
-    results[id * 36 + 15] = triangles[1].third.x;
-    results[id * 36 + 16] = triangles[1].third.y;
-    results[id * 36 + 17] = triangles[1].third.z;
-    results[id * 36 + 18] = triangles[2].first.x;
-    results[id * 36 + 19] = triangles[2].first.y;
-    results[id * 36 + 20] = triangles[2].first.z;
-    results[id * 36 + 21] = triangles[2].second.x;
-    results[id * 36 + 22] = triangles[2].second.y;
-    results[id * 36 + 23] = triangles[2].second.z;
-    results[id * 36 + 24] = triangles[2].third.x;
-    results[id * 36 + 25] = triangles[2].third.y;
-    results[id * 36 + 26] = triangles[2].third.z;
-    results[id * 36 + 27] = triangles[3].first.x;
-    results[id * 36 + 28] = triangles[3].first.y;
-    results[id * 36 + 29] = triangles[3].first.z;
-    results[id * 36 + 30] = triangles[3].second.x;
-    results[id * 36 + 31] = triangles[3].second.y;
-    results[id * 36 + 32] = triangles[3].second.z;
-    results[id * 36 + 33] = triangles[3].third.x;
-    results[id * 36 + 34] = triangles[3].third.y;
-    results[id * 36 + 35] = triangles[3].third.z;
+    results[id * 36 + 5]  = triangles[0].second.z;
+    results[id * 36 + 6]  = triangles[0].third.x;
+    results[id * 36 + 7]  = triangles[0].third.y;
+    results[id * 36 + 8]  = triangles[0].third.z;
+    results[id * 36 + 9]  = triangles[1].first.x;
+    results[id * 36 + 10]  = triangles[1].first.y;
+    results[id * 36 + 11]  = triangles[1].first.z;
+    results[id * 36 + 12]  = triangles[1].second.x;
+    results[id * 36 + 13]  = triangles[1].second.y;
+    results[id * 36 + 14]  = triangles[1].second.z;
+    results[id * 36 + 15]  = triangles[1].third.x;
+    results[id * 36 + 16]  = triangles[1].third.y;
+    results[id * 36 + 17]  = triangles[1].third.z;
+    results[id * 36 + 18]  = triangles[2].first.x;
+    results[id * 36 + 19]  = triangles[2].first.y;
+    results[id * 36 + 20]  = triangles[2].first.z;
+    results[id * 36 + 21]  = triangles[2].second.x;
+    results[id * 36 + 22]  = triangles[2].second.y;
+    results[id * 36 + 23]  = triangles[2].second.z;
+    results[id * 36 + 24]  = triangles[2].third.x;
+    results[id * 36 + 25]  = triangles[2].third.y;
+    results[id * 36 + 26]  = triangles[2].third.z;
+    results[id * 36 + 27]  = triangles[3].first.x;
+    results[id * 36 + 28]  = triangles[3].first.y;
+    results[id * 36 + 29]  = triangles[3].first.z;
+    results[id * 36 + 30]  = triangles[3].second.x;
+    results[id * 36 + 31]  = triangles[3].second.y;
+    results[id * 36 + 32]  = triangles[3].second.z;
+    results[id * 36 + 33]  = triangles[3].third.x;
+    results[id * 36 + 34]  = triangles[3].third.y;
+    results[id * 36 + 35]  = triangles[3].third.z;
 }`;

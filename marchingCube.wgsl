@@ -135,8 +135,8 @@ fn main(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(local_invocatio
         triangles[start / 3].third = vertlist[(triTable[tempIndex + 2])];
     }
 
-    results[id * 36] = triangles[0].first.x;
-    results[id * 36 + 1] = triangles[0].first.y;
+    results[id * u32(36)] = triangles[0].first.x;
+    results[id * u32(36) + u32(1)] = triangles[0].first.y;
     results[id * 36 + 2] = triangles[0].first.z;
     results[id * 36 + 3] = triangles[0].second.x;
     results[id * 36 + 4] = triangles[0].second.y;

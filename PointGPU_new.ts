@@ -176,6 +176,20 @@ export let marchingCubeGPU = async (
     var data = copyArrayBuffer.slice(0, points.length * 4 * 3 * 12);
     stagingBuffer.unmap();
     let temp = new Float32Array(data);
+    var count = 0;
+    let temp2 = new Float32Array(temp.length);
+    for (var i = 0; i < temp.length; i += 9) {
+        let isGood = false;
+        for (var j = 0; j < 9; j++) {
+            temp2[i + j] = temp[i + j];
+            if (temp[i + j] != 0) {
+                isGood = true;
+            }
+            count++;
+        }
+        if (!isGood) count -= 9;
+    }
+    temp = new Float32Array(temp2.slice(0, count));
     for (var i = 0; i < temp.length; i++) {
         temp[i] -= 25;
     }
