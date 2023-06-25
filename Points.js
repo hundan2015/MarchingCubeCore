@@ -10,10 +10,7 @@ export let getTestPoints = (size, radius) => {
                 let pointTemp = {
                     position: new THREE.Vector3(i, j, k),
                     value: 0,
-                    id: 0,
-                    pattern: 0,
                 };
-                pointTemp.id = id;
                 pointTemp.position = new THREE.Vector3(i, j, k);
                 let reletiveX = i - size / 2;
                 let reletiveY = j - size / 2;
@@ -131,6 +128,7 @@ export let marchingCubeAlgorithum = (points, size, isoLevel) => {
         vertices[i + 7] = faces[i / 9].third.y - 50;
         vertices[i + 8] = faces[i / 9].third.z - 50;
     }
+    console.log("vertices", vertices);
     return vertices;
 };
 let VertexInterp = (isolevel, p1, p2, valp1, valp2) => {

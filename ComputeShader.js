@@ -1,3 +1,4 @@
+export let computeShader = /* wgsl */ `
 struct Point {
     position: vec3<f32>,
     value: f32,
@@ -171,4 +172,4 @@ fn main(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(local_invocatio
     results[id * 36 + 33] = triangles[3].third.x;
     results[id * 36 + 34] = triangles[3].third.y;
     results[id * 36 + 35] = triangles[3].third.z;
-}
+}`;

@@ -2,10 +2,8 @@ import { edgeTable, triTable } from "./table.js";
 import * as THREE from "./node_modules/three/build/three.module.js";
 
 export interface Point {
-    position: THREE.Vector3;
-    value: number;
-    id: number;
-    pattern: number;
+    position: THREE.Vector3; // 12B
+    value: number;           // 4B
 }
 
 export interface Face {
@@ -24,10 +22,7 @@ export let getTestPoints = (size: number, radius: number): Point[] => {
                 let pointTemp: Point = {
                     position: new THREE.Vector3(i, j, k),
                     value: 0,
-                    id: 0,
-                    pattern: 0,
                 };
-                pointTemp.id = id;
                 pointTemp.position = new THREE.Vector3(i, j, k);
                 let reletiveX = i - size / 2;
                 let reletiveY = j - size / 2;
@@ -221,6 +216,7 @@ export let marchingCubeAlgorithum = (
         vertices[i + 7] = faces[i / 9].third.y - 50;
         vertices[i + 8] = faces[i / 9].third.z - 50;
     }
+    console.log("vertices", vertices);
     return vertices;
 };
 

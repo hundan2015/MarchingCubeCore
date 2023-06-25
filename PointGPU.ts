@@ -1,5 +1,6 @@
 import { Point, Face } from "./Points";
 import { edgeTable, triTable } from "./table.js";
+import { computeShader } from "./ComputeShader.js";
 let adapter = await navigator.gpu.requestAdapter();
 if (!adapter) throw Error("Could'nt request WebGPU adapter.");
 let device = await adapter.requestDevice();
@@ -9,7 +10,6 @@ export let marchingCubeGPU = (
     size: number,
     isoLevel: number
 ): Float32Array => {
-    let computeShader: string = ``;
     var module = device.createShaderModule({
         code: computeShader,
     });
@@ -47,6 +47,20 @@ export let marchingCubeGPU = (
                     type: "storage",
                 },
             },
+            {
+                binding: 4,
+                visibility: GPUShaderStage.COMPUTE,
+                buffer: {
+                    type: "storage",
+                },
+            },
+            {
+                binding: 5,
+                visibility: GPUShaderStage.COMPUTE,
+                buffer: {
+                    type: "storage",
+                },
+            },
         ],
     });
     var pipeline = device.createComputePipeline({
@@ -56,10 +70,10 @@ export let marchingCubeGPU = (
         }),
     });
     // 6 = 3(vector)+3(number)
-    let POINT_BUFFER_SIZE = points.length * 6;
-    let TRIANGLE_TABLE_BUFFER_SIZE = triTable.length;
-    let EDGE_TABLE_BUFFER_SIZE = edgeTable.length;
-    let FACE_TABLE_BUFFER_SIZE = size * size * size * 4 * 9;
+    let POINT_BUFFER_SIZE = points.length * 24;
+    let TRIANGLE_TABLE_BUFFER_SIZE = triTable.length * 4;
+    let EDGE_TABLE_BUFFER_SIZE = edgeTable.length * 4;
+    let FACE_TABLE_BUFFER_SIZE = size * size * size * 4 * 9 * 4;
     var pointTableBuffer = device.createBuffer({
         size: POINT_BUFFER_SIZE,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
@@ -80,10 +94,82 @@ export let marchingCubeGPU = (
         size: FACE_TABLE_BUFFER_SIZE,
         usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
     });
+    var isoLevelBuffer = device.createBuffer({
+        size: 4,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    });
+    var sizeBuffer = device.createBuffer({
+        size: 4,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    });
+    let pointTableData = new ArrayBuffer(POINT_BUFFER_SIZE);
+    let pointTableDataview = new DataView(pointTableData);
+    for (var i = 0; i < points.length; i++) {
+        pointTableDataview.setFloat32(i * 24, points[i].position.x);
+        pointTableDataview.setFloat32(i * 24 + 4, points[i].position.y);
+        pointTableDataview.setFloat32(i * 24 + 8, points[i].position.z);
+        pointTableDataview.setFloat32(i * 24 + 12, points[i].value);
+    }
+    device.queue.writeBuffer(pointTableBuffer, 0, pointTableData);
+    device.queue.writeBuffer(triangleTableBuffer, 0, triTable);
+    device.queue.writeBuffer(edgeTableBuffer, 0, triTable);
+
+    let isoLevelData = new ArrayBuffer(4);
+    const isoLevelDataview = new DataView(isoLevelData);
+    isoLevelDataview.setFloat32(0, isoLevel);
+    device.queue.writeBuffer(isoLevelBuffer, 0, isoLevelData);
+    //
+    let sizeData = new ArrayBuffer(4);
+    const sizeDataview = new DataView(sizeData);
+    sizeDataview.setUint32(0, size);
+    device.queue.writeBuffer(sizeBuffer, 0, sizeData);
+    // Create bind group
+    const bindGroup = device.createBindGroup({
+        layout: bindGroupLayout,
+        entries: [
+            {
+                binding: 0,
+                resource: {
+                    buffer: triangleTableBuffer,
+                },
+            },
+            {
+                binding: 1,
+                resource: {
+                    buffer: edgeTableBuffer,
+                },
+            },
+            {
+                binding: 2,
+                resource: {
+                    buffer: pointTableBuffer,
+                },
+            },
+            {
+                binding: 3,
+                resource: {
+                    buffer: faceTableBuffer,
+                },
+            },
+            {
+                binding: 4,
+                resource: {
+                    buffer: isoLevelBuffer,
+                },
+            },
+            {
+                binding: 5,
+                resource: {
+                    buffer: sizeBuffer,
+                },
+            },
+        ],
+    });
 
     var commandEncoder = device.createCommandEncoder();
     var passEncoder = commandEncoder.beginComputePass();
     passEncoder.setPipeline(pipeline);
+    passEncoder.setBindGroup(0, bindGroup);
     passEncoder.dispatchWorkgroups(1);
     passEncoder.end();
     commandEncoder.copyBufferToBuffer(
