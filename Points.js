@@ -11,6 +11,7 @@ export let getTestPoints = (size, radius) => {
                     position: new THREE.Vector3(i, j, k),
                     value: 0,
                     id: 0,
+                    pattern: 0,
                 };
                 pointTemp.id = id;
                 pointTemp.position = new THREE.Vector3(i, j, k);
@@ -39,17 +40,6 @@ export let marchingCubeAlgorithum = (points, size, isoLevel) => {
                 for (let count = 9; count < 12; count++) {
                     vertlist.push(new THREE.Vector3());
                 }
-                // cube index maybe wrong.
-                /* let cubeIndex: number[] = [
-                    i * size * size + j * size + k,
-                    (i + 1) * size * size + j * size + k,
-                    i * size * size + (j + 1) * size + k,
-                    (i + 1) * size * size + (j + 1) * size + k,
-                    i * size * size + j * size + k + 1,
-                    (i + 1) * size * size + j * size + k + 1,
-                    i * size * size + (j + 1) * size + k + 1,
-                    (i + 1) * size * size + (j + 1) * size + k + 1,
-                ]; */
                 let cubeIndex = [
                     i * size * size + j * size + k,
                     i * size * size + j * size + k + 1,
@@ -122,13 +112,26 @@ export let marchingCubeAlgorithum = (points, size, isoLevel) => {
                     };
                     triangleCount++;
                 }
-                for (var temp = 0; temp < triangles.length; temp++) {
+                for (var temp = 0; temp < triangleCount; temp++) {
                     result.push(triangles[temp]);
                 }
             }
         }
     }
-    return result;
+    let faces = result;
+    let vertices = new Float32Array(9 * faces.length);
+    for (var i = 0; i < faces.length * 9; i += 9) {
+        vertices[i] = faces[i / 9].first.x - 50;
+        vertices[i + 1] = faces[i / 9].first.y - 50;
+        vertices[i + 2] = faces[i / 9].first.z - 50;
+        vertices[i + 3] = faces[i / 9].second.x - 50;
+        vertices[i + 4] = faces[i / 9].second.y - 50;
+        vertices[i + 5] = faces[i / 9].second.z - 50;
+        vertices[i + 6] = faces[i / 9].third.x - 50;
+        vertices[i + 7] = faces[i / 9].third.y - 50;
+        vertices[i + 8] = faces[i / 9].third.z - 50;
+    }
+    return vertices;
 };
 let VertexInterp = (isolevel, p1, p2, valp1, valp2) => {
     let mu = 0;

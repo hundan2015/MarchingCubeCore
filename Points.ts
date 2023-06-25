@@ -48,7 +48,7 @@ export let marchingCubeAlgorithum = (
     points: Point[],
     size: number,
     isoLevel: number
-): Face[] => {
+): Float32Array => {
     let result: Face[] = [];
     // Build the cube index. Which can be put into the WebGPU.
     for (var i = 0; i < size - 1; i++) {
@@ -202,13 +202,26 @@ export let marchingCubeAlgorithum = (
                     };
                     triangleCount++;
                 }
-                for (var temp = 0; temp < triangles.length; temp++) {
+                for (var temp = 0; temp < triangleCount; temp++) {
                     result.push(triangles[temp]);
                 }
             }
         }
     }
-    return result;
+    let faces = result;
+    let vertices = new Float32Array(9 * faces.length);
+    for (var i = 0; i < faces.length * 9; i += 9) {
+        vertices[i] = faces[i / 9].first.x - 50;
+        vertices[i + 1] = faces[i / 9].first.y - 50;
+        vertices[i + 2] = faces[i / 9].first.z - 50;
+        vertices[i + 3] = faces[i / 9].second.x - 50;
+        vertices[i + 4] = faces[i / 9].second.y - 50;
+        vertices[i + 5] = faces[i / 9].second.z - 50;
+        vertices[i + 6] = faces[i / 9].third.x - 50;
+        vertices[i + 7] = faces[i / 9].third.y - 50;
+        vertices[i + 8] = faces[i / 9].third.z - 50;
+    }
+    return vertices;
 };
 
 let VertexInterp = (
