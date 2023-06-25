@@ -158,11 +158,12 @@ export let marchingCubeGPU = async (points, size, isoLevel) => {
     let temp2 = new Float32Array(temp.length);
     // 为什么会丢失部分点的信息？
     for (var i = 0; i < temp.length; i += 9) {
-        let isGood = false;
+        let isGood = true;
         for (var j = 0; j < 9; j++) {
             temp2[count + j] = temp[i + j];
-            if (temp[i + j] != 0) {
-                isGood = true;
+            if (temp[i + j] == 0) {
+                isGood = false;
+                break;
             }
         }
         if (isGood)

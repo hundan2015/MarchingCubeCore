@@ -115,7 +115,7 @@ fn main(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(local_invocatio
         vertlist[5] = VertexInterp(isoLevel, points[(cubeIndex[5])].position, points[(cubeIndex[7])].position, points[(cubeIndex[5])].value, points[(cubeIndex[7])].value);
     }
     if (bits & 64) != 0 {
-        vertlist[6] = VertexInterp(isoLevel, points[(cubeIndex[6])].position, points[(cubeIndex[7])].position, points[(cubeIndex[6])].value, points[9].value);
+        vertlist[6] = VertexInterp(isoLevel, points[(cubeIndex[6])].position, points[(cubeIndex[7])].position, points[(cubeIndex[6])].value, points[(cubeIndex[7])].value);
     }
     if (bits & 128) != 0 {
         vertlist[7] = VertexInterp(isoLevel, points[(cubeIndex[4])].position, points[(cubeIndex[6])].position, points[(cubeIndex[4])].value, points[(cubeIndex[6])].value);
