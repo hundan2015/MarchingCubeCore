@@ -11,7 +11,7 @@ document.body.appendChild(renderer.domElement);
 const geometry = new THREE.BufferGeometry();
 let points = POINT.getTestPoints(50, 60);
 let vertices_ = POINT.marchingCubeAlgorithum(points, 50, 30);
-let tempPromise = POINTGPU.marchingCubeGPU(points, 50, 15);
+let tempPromise = POINTGPU.marchingCubeGPU(points, 50, 30);
 
 
 tempPromise.then((vertices) => {

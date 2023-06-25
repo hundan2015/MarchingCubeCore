@@ -64,10 +64,6 @@ fn main(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(local_invocatio
     let y = id%(size*size)/size;
     let z = id%(size);
 
-    if(x>=size-1 || y>=size-1 || z>=size-1) {
-        return;
-    }
-
     var targetIndex: i32 = 0;
     if points[u32(cubeIndex[0])].value < isoLevel {
         targetIndex |= 1;
@@ -143,6 +139,7 @@ fn main(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(local_invocatio
         triangles[start / 3].second = vertlist[(triTable[tempIndex + 1])];
         triangles[start / 3].third = vertlist[(triTable[tempIndex + 2])];
     }
+    // 感觉还是在hash这块除了问题
     id = (size-1)*(size-1)*x+(size-1)*y+z;
     results[id * 36]  = triangles[0].first.x;
     results[id * 36 + 1] = triangles[0].first.y;
