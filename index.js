@@ -10,18 +10,9 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 const geometry = new THREE.BufferGeometry();
 let points = POINT.getTestPoints(50, 60);
-let vertices_ = POINT.marchingCubeAlgorithum(points, 50, 30);
+//let vertices = POINT.marchingCubeAlgorithum(points, 100, 60);
 let tempPromise = POINTGPU.marchingCubeGPU(points, 50, 30);
-
-
 tempPromise.then((vertices) => {
-    /* for (var i = 0;i<vertices.length;i++){
-        if (vertices[i] != vertices_[i]) {
-            console.log(i + "vertices:"+vertices[i]);
-            console.log(i + "vertices_:" + vertices_[i]);
-            console.log("_________________________");
-        }
-    } */
     geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     material.wireframe = true;

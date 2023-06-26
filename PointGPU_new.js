@@ -56,20 +56,24 @@ export let marchingCubeGPU = async (points, size, isoLevel) => {
         }),
     });
     // Create buffer.
+    const RESULT_BUFFER_SIZE = points.length * 4 * 3 * 12;
+    const POINTS_BUFFER_SIZE = 16 * points.length;
+    const EDGE_TABLE_BUFFER_SIZE = 4 * edgeTable.length;
+    const TRI_TABLE_BUFFER_SIZE = 4 * triTable.length;
     var triTableBuffer = device.createBuffer({
-        size: 4 * triTable.length,
+        size: TRI_TABLE_BUFFER_SIZE,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     });
     var edgeTableBuffer = device.createBuffer({
-        size: 4 * edgeTable.length,
+        size: EDGE_TABLE_BUFFER_SIZE,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     });
     var pointsBuffer = device.createBuffer({
-        size: 16 * points.length,
+        size: POINTS_BUFFER_SIZE,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     });
     var resultsBuffer = device.createBuffer({
-        size: points.length * 4 * 3 * 12,
+        size: RESULT_BUFFER_SIZE,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
     });
     var isoBuffer = device.createBuffer({
@@ -146,33 +150,31 @@ export let marchingCubeGPU = async (points, size, isoLevel) => {
     passEncoder.setBindGroup(0, bindGroup);
     passEncoder.dispatchWorkgroups(256, 256, 256);
     passEncoder.end();
-    commandEncoder.copyBufferToBuffer(resultsBuffer, 0, stagingBuffer, 0, points.length * 4 * 3 * 12);
+    commandEncoder.copyBufferToBuffer(resultsBuffer, 0, stagingBuffer, 0, RESULT_BUFFER_SIZE);
     var commands = commandEncoder.finish();
     device.queue.submit([commands]);
-    await stagingBuffer.mapAsync(GPUMapMode.READ, 0, points.length * 4 * 3 * 12);
-    var copyArrayBuffer = stagingBuffer.getMappedRange(0, points.length * 4 * 3 * 12);
-    var data = copyArrayBuffer.slice(0, points.length * 4 * 3 * 12);
+    await stagingBuffer.mapAsync(GPUMapMode.READ, 0, RESULT_BUFFER_SIZE);
+    var copyArrayBuffer = stagingBuffer.getMappedRange(0, RESULT_BUFFER_SIZE);
+    var data = copyArrayBuffer.slice(0, RESULT_BUFFER_SIZE);
     stagingBuffer.unmap();
     let temp = new Float32Array(data);
     var count = 0;
     let temp2 = new Float32Array(temp.length);
-    // 为什么会丢失部分点的信息？
     for (var i = 0; i < temp.length; i += 9) {
-        let isGood = true;
+        let isGood = false;
         for (var j = 0; j < 9; j++) {
             temp2[count + j] = temp[i + j];
-            if (temp[i + j] == 0) {
-                isGood = false;
-                break;
+            if (temp[i + j] != 0) {
+                isGood = true;
+                //break;
             }
         }
         if (isGood)
             count += 9;
     }
     temp = new Float32Array(temp2.slice(0, count));
-    
     for (var i = 0; i < temp.length; i++) {
-        temp[i] -= 50;
+        temp[i] -= size/2;
     }
     console.log(temp);
     return temp;

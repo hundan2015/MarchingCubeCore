@@ -60,10 +60,14 @@ fn main(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(local_invocatio
         id + size * size + size + u32(1),
     );
 
+    if id >= (size-1) * (size-1) * (size-1) { return; }
     let x = id/(size*size);
     let y = id%(size*size)/size;
     let z = id%(size);
-
+    if(x >= size-1 || x >= size-1 || x >= size-1) {
+        return;
+    }
+    // test
     var targetIndex: i32 = 0;
     if points[u32(cubeIndex[0])].value < isoLevel {
         targetIndex |= 1;
@@ -89,17 +93,17 @@ fn main(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(local_invocatio
     if points[u32(cubeIndex[7])].value < isoLevel {
         targetIndex |= 64;
     }
-    if id > size * size * size { return; }
+
 
     let bits = edgeTable[targetIndex];
     if bits == 0 {
         return;
     }
     var vertlist = array<vec3<f32>,12>();
-    if (bits & 1) == 0 {
+    if (bits & 1) != 0 {
         vertlist[0] = VertexInterp(isoLevel, points[(cubeIndex[0])].position, points[(cubeIndex[1])].position, points[(cubeIndex[0])].value, points[(cubeIndex[1])].value);
     }
-    if (bits & 2) == 0 {
+    if (bits & 2) != 0 {
         vertlist[1] = VertexInterp(isoLevel, points[(cubeIndex[1])].position, points[(cubeIndex[3])].position, points[(cubeIndex[1])].value, points[(cubeIndex[3])].value);
     }
     if (bits & 4) != 0 {
@@ -133,15 +137,27 @@ fn main(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(local_invocatio
         vertlist[11] = VertexInterp(isoLevel, points[(cubeIndex[2])].position, points[(cubeIndex[6])].position, points[(cubeIndex[2])].value, points[(cubeIndex[6])].value);
     }
     var triangles = array<Triangle,4>();
+    var count:u32 = 0;
     for (var start = 0; triTable[16 * targetIndex + start] != -1; start += 3) {
         let tempIndex = (16 * targetIndex) + start;
-        triangles[start / 3].first = vertlist[(triTable[tempIndex])];
-        triangles[start / 3].second = vertlist[(triTable[tempIndex + 1])];
-        triangles[start / 3].third = vertlist[(triTable[tempIndex + 2])];
+        let tempShit = start / 3;
+        results[id * 36 + count] = vertlist[(triTable[tempIndex])].x;
+        results[id * 36 + count + 1] = vertlist[(triTable[tempIndex])].y;
+        results[id * 36 + count + 2] = vertlist[(triTable[tempIndex])].z;
+        results[id * 36 + count + 3] = vertlist[(triTable[tempIndex+1])].x;
+        results[id * 36 + count + 4] = vertlist[(triTable[tempIndex+1])].y;
+        results[id * 36 + count + 5] = vertlist[(triTable[tempIndex+1])].z;
+        results[id * 36 + count + 6] = vertlist[(triTable[tempIndex+2])].x;
+        results[id * 36 + count + 7] = vertlist[(triTable[tempIndex+2])].y;
+        results[id * 36 + count + 8] = vertlist[(triTable[tempIndex+2])].z;
+        count+=9;
+        /* triangles[tempShit].first = vertlist[(triTable[tempIndex])];
+        triangles[tempShit].second = vertlist[(triTable[tempIndex + 1])];
+        triangles[tempShit].third = vertlist[(triTable[tempIndex + 2])]; */
     }
     // 感觉还是在hash这块除了问题
-    id = (size-1)*(size-1)*x+(size-1)*y+z;
-    results[id * 36]  = triangles[0].first.x;
+    //id = (size-2)*(size-2)*x+(size-2)*y+z;
+    /* results[id * 36]  = triangles[0].first.x;
     results[id * 36 + 1] = triangles[0].first.y;
     results[id * 36 + 2] = triangles[0].first.z;
     results[id * 36 + 3] = triangles[0].second.x;
@@ -176,5 +192,5 @@ fn main(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(local_invocatio
     results[id * 36 + 32]  = triangles[3].second.z;
     results[id * 36 + 33]  = triangles[3].third.x;
     results[id * 36 + 34]  = triangles[3].third.y;
-    results[id * 36 + 35]  = triangles[3].third.z;
+    results[id * 36 + 35]  = triangles[3].third.z; */
 }`;
