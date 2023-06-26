@@ -151,46 +151,5 @@ fn main(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(local_invocatio
         results[id * 36 + count + 7] = vertlist[(triTable[tempIndex+2])].y;
         results[id * 36 + count + 8] = vertlist[(triTable[tempIndex+2])].z;
         count+=9;
-        /* triangles[tempShit].first = vertlist[(triTable[tempIndex])];
-        triangles[tempShit].second = vertlist[(triTable[tempIndex + 1])];
-        triangles[tempShit].third = vertlist[(triTable[tempIndex + 2])]; */
     }
-    // 感觉还是在hash这块除了问题
-    //id = (size-2)*(size-2)*x+(size-2)*y+z;
-    /* results[id * 36]  = triangles[0].first.x;
-    results[id * 36 + 1] = triangles[0].first.y;
-    results[id * 36 + 2] = triangles[0].first.z;
-    results[id * 36 + 3] = triangles[0].second.x;
-    results[id * 36 + 4] = triangles[0].second.y;
-    results[id * 36 + 5]  = triangles[0].second.z;
-    results[id * 36 + 6]  = triangles[0].third.x;
-    results[id * 36 + 7]  = triangles[0].third.y;
-    results[id * 36 + 8]  = triangles[0].third.z;
-    results[id * 36 + 9]  = triangles[1].first.x;
-    results[id * 36 + 10]  = triangles[1].first.y;
-    results[id * 36 + 11]  = triangles[1].first.z;
-    results[id * 36 + 12]  = triangles[1].second.x;
-    results[id * 36 + 13]  = triangles[1].second.y;
-    results[id * 36 + 14]  = triangles[1].second.z;
-    results[id * 36 + 15]  = triangles[1].third.x;
-    results[id * 36 + 16]  = triangles[1].third.y;
-    results[id * 36 + 17]  = triangles[1].third.z;
-    results[id * 36 + 18]  = triangles[2].first.x;
-    results[id * 36 + 19]  = triangles[2].first.y;
-    results[id * 36 + 20]  = triangles[2].first.z;
-    results[id * 36 + 21]  = triangles[2].second.x;
-    results[id * 36 + 22]  = triangles[2].second.y;
-    results[id * 36 + 23]  = triangles[2].second.z;
-    results[id * 36 + 24]  = triangles[2].third.x;
-    results[id * 36 + 25]  = triangles[2].third.y;
-    results[id * 36 + 26]  = triangles[2].third.z;
-    results[id * 36 + 27]  = triangles[3].first.x;
-    results[id * 36 + 28]  = triangles[3].first.y;
-    results[id * 36 + 29]  = triangles[3].first.z;
-    results[id * 36 + 30]  = triangles[3].second.x;
-    results[id * 36 + 31]  = triangles[3].second.y;
-    results[id * 36 + 32]  = triangles[3].second.z;
-    results[id * 36 + 33]  = triangles[3].third.x;
-    results[id * 36 + 34]  = triangles[3].third.y;
-    results[id * 36 + 35]  = triangles[3].third.z; */
 }`;

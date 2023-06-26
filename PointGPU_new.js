@@ -174,7 +174,7 @@ export let marchingCubeGPU = async (points, size, isoLevel) => {
     }
     temp = new Float32Array(temp2.slice(0, count));
     for (var i = 0; i < temp.length; i++) {
-        temp[i] -= size/2;
+        temp[i] -= size / 2;
     }
     console.log(temp);
     return temp;

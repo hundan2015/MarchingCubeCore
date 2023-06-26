@@ -176,19 +176,19 @@ export let marchingCubeGPU = async (
     var count = 0;
     let temp2 = new Float32Array(temp.length);
     for (var i = 0; i < temp.length; i += 9) {
-        let isGood = true;
+        let isGood = false;
         for (var j = 0; j < 9; j++) {
             temp2[count + j] = temp[i + j];
-            if (temp[i + j] == 0) {
-                isGood = false;
-                break;
+            if (temp[i + j] != 0) {
+                isGood = true;
+                //break;
             }
         }
         if (isGood) count += 9;
     }
     temp = new Float32Array(temp2.slice(0, count));
     for (var i = 0; i < temp.length; i++) {
-        temp[i] -= 25;
+        temp[i] -= size / 2;
     }
     console.log(temp);
     return temp;
