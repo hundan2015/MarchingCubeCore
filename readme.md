@@ -1,5 +1,12 @@
 # Marching cube in WebGPU
 
+## 文件列表
+
+* computerShader.js：放shader文件，和computeShader.wgsl保持同步。
+* index.js：主js文件，调用marchingCube接口，并将其添加到场景中。
+* Points.js：放基本数据结构的定义，并提供了一个marchingCube的js实现。
+* PointGPU_new.js：最后的GPU版本。提供了一个marchingCube的WebGPU实现。
+
 ## 计算着色器管线
 
 WebGPU对应的编程语言WGSL是一种类似Rust的shader语言。其中最需要注意的是其具有非常严格的类型检查。
