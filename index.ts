@@ -25,12 +25,13 @@ tempPromise.then((vertices) => {
     const cube = new THREE.Mesh(geometry, material);
     scene.add(cube);
     vertices = undefined;
-    camera.position.z = 70;
-
-    function animate() {
-        requestAnimationFrame(animate);
-
-        renderer.render(scene, camera);
-    }
-    animate();
 });
+
+camera.position.z = 70;
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    renderer.render(scene, camera);
+}
+animate();
