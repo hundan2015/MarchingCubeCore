@@ -7,9 +7,12 @@ let device = await adapter.requestDevice();
 
 export let marchingCubeGPU = async (
     points: Point[],
-    size: number,
+    length: number,
+    width: number,
+    height: number,
     isoLevel: number
 ): Promise<Float32Array> => {
+    // 注意！！！只能通过改变height来做slice！
     var module = device.createShaderModule({
         code: computeShader,
     });
@@ -46,9 +49,20 @@ export let marchingCubeGPU = async (
                 visibility: GPUShaderStage.COMPUTE,
                 buffer: { type: "storage" },
             },
-            //test
+            /*             //test
             {
                 binding: 6,
+                visibility: GPUShaderStage.COMPUTE,
+                buffer: { type: "storage" },
+            }, */
+            // height and width.
+            {
+                binding: 6,
+                visibility: GPUShaderStage.COMPUTE,
+                buffer: { type: "storage" },
+            },
+            {
+                binding: 7,
                 visibility: GPUShaderStage.COMPUTE,
                 buffer: { type: "storage" },
             },
@@ -66,6 +80,7 @@ export let marchingCubeGPU = async (
     const POINTS_BUFFER_SIZE = 16 * points.length;
     const EDGE_TABLE_BUFFER_SIZE = 4 * edgeTable.length;
     const TRI_TABLE_BUFFER_SIZE = 4 * triTable.length;
+    // Create info buffer.
     var triTableBuffer = device.createBuffer({
         size: TRI_TABLE_BUFFER_SIZE,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
@@ -82,27 +97,37 @@ export let marchingCubeGPU = async (
         size: RESULT_BUFFER_SIZE,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
     });
-
+    // Create basic input buffer.
     var isoBuffer = device.createBuffer({
         size: 4,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     });
-    var sizeBuffer = device.createBuffer({
+    var lengthBuffer = device.createBuffer({
+        size: 4,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    });
+    var heightBuffer = device.createBuffer({
+        size: 4,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    });
+    var widthBuffer = device.createBuffer({
         size: 4,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     });
 
-    //test buffer
+    /*     //test buffer
     var testTriangleIndexBuffer = device.createBuffer({
         size: points.length * 4,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
-    });
+    }); */
 
     // Write to buffer.
     device.queue.writeBuffer(triTableBuffer, 0, triTable);
     device.queue.writeBuffer(edgeTableBuffer, 0, edgeTable);
     device.queue.writeBuffer(isoBuffer, 0, new Float32Array([isoLevel]));
-    device.queue.writeBuffer(sizeBuffer, 0, new Uint32Array([size]));
+    device.queue.writeBuffer(lengthBuffer, 0, new Uint32Array([length]));
+    device.queue.writeBuffer(widthBuffer, 0, new Uint32Array([width]));
+    device.queue.writeBuffer(heightBuffer, 0, new Uint32Array([height]));
     let pointTableData = new ArrayBuffer(16 * points.length);
     let pointTableDataview = new DataView(pointTableData);
     for (var i = 0; i < points.length; i++) {
@@ -144,12 +169,16 @@ export let marchingCubeGPU = async (
             },
             {
                 binding: 5,
-                resource: { buffer: sizeBuffer },
+                resource: { buffer: lengthBuffer },
             },
-            // tests
+            // height and width.
             {
                 binding: 6,
-                resource: { buffer: testTriangleIndexBuffer },
+                resource: { buffer: heightBuffer },
+            },
+            {
+                binding: 7,
+                resource: { buffer: widthBuffer },
             },
         ],
     });
@@ -187,8 +216,10 @@ export let marchingCubeGPU = async (
         if (isGood) count += 9;
     }
     temp = new Float32Array(temp2.slice(0, count));
-    for (var i = 0; i < temp.length; i++) {
-        temp[i] -= size / 2;
+    for (var i = 0; i < temp.length; i += 3) {
+        temp[i] -= length / 2;
+        temp[i + 1] -= width / 2;
+        temp[i + 2] -= height / 2;
     }
     console.log(temp);
     return temp;

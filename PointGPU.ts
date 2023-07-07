@@ -7,7 +7,9 @@ let device = await adapter.requestDevice();
 
 export let marchingCubeGPU = (
     points: Point[],
-    size: number,
+    length: number,
+    width: number,
+    height: number,
     isoLevel: number
 ): Float32Array => {
     var module = device.createShaderModule({
@@ -73,7 +75,7 @@ export let marchingCubeGPU = (
     let POINT_BUFFER_SIZE = points.length * 24;
     let TRIANGLE_TABLE_BUFFER_SIZE = triTable.length * 4;
     let EDGE_TABLE_BUFFER_SIZE = edgeTable.length * 4;
-    let FACE_TABLE_BUFFER_SIZE = size * size * size * 4 * 9 * 4;
+    let FACE_TABLE_BUFFER_SIZE = length * length * length * 4 * 9 * 4;
     var pointTableBuffer = device.createBuffer({
         size: POINT_BUFFER_SIZE,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
@@ -94,14 +96,26 @@ export let marchingCubeGPU = (
         size: FACE_TABLE_BUFFER_SIZE,
         usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
     });
+
+    // Setup basic info buffer.
     var isoLevelBuffer = device.createBuffer({
         size: 4,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     });
-    var sizeBuffer = device.createBuffer({
+    var lengthBuffer = device.createBuffer({
         size: 4,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     });
+    var widthBuffer = device.createBuffer({
+        size: 4,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    });
+    var heightBuffer = device.createBuffer({
+        size: 4,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    });
+
+    // Initialize input buffer data.
     let pointTableData = new ArrayBuffer(POINT_BUFFER_SIZE);
     let pointTableDataview = new DataView(pointTableData);
     for (var i = 0; i < points.length; i++) {
@@ -121,8 +135,8 @@ export let marchingCubeGPU = (
     //
     let sizeData = new ArrayBuffer(4);
     const sizeDataview = new DataView(sizeData);
-    sizeDataview.setUint32(0, size);
-    device.queue.writeBuffer(sizeBuffer, 0, sizeData);
+    sizeDataview.setUint32(0, length);
+    device.queue.writeBuffer(lengthBuffer, 0, sizeData);
     // Create bind group
     const bindGroup = device.createBindGroup({
         layout: bindGroupLayout,
@@ -160,7 +174,7 @@ export let marchingCubeGPU = (
             {
                 binding: 5,
                 resource: {
-                    buffer: sizeBuffer,
+                    buffer: lengthBuffer,
                 },
             },
         ],
