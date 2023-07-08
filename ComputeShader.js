@@ -60,7 +60,7 @@ fn main(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(local_invocatio
         id + width * length + length + u32(1),
     );
 
-    if id >= (length - u32(1)) * (height - u32(1)) * (width - u32(1)) { return; }
+    if id >= (length ) * (height) * (width ) { return; }
 
     var targetIndex: i32 = 0;
     if points[(cubeIndex[0])].value < isoLevel {

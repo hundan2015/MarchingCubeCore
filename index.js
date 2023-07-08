@@ -21,7 +21,7 @@ export let makeNewShit = (isoLevel) => {
             var geometry = new THREE.BufferGeometry();
             geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
             var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-            material.wireframe = true;
+            //material.wireframe = true;
             var cube = new THREE.Mesh(geometry, material);
             scene.add(cube);
             vertices = undefined;
